@@ -47,7 +47,7 @@ function BalanceBox({ boxType, balance }) {
 		<div className='expense-tracker__balance-box'>
 			<p className='expense-tracker__box-title'>{boxType}</p>
 			<p className={`expense-tracker__partial-balance expense-tracker__partial-balance--${boxType}`}>
-				{balance >= 0 ? `${balance.toFixed(2)}` : `-$${Math.abs(balance).toFixed(2)}`}
+				{balance >= 0 ? `$${balance.toFixed(2)}` : `-$${Math.abs(balance).toFixed(2)}`}
 			</p>
 		</div>
 	)
