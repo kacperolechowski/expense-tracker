@@ -1,24 +1,51 @@
-const transactions = [
-	{ amount: 5000, id: 4, text: 'Salary' },
-	{ amount: -50, id: 1, text: 'Cinema' },
-	{ amount: -3000, id: 3, text: 'Car' },
-]
+import { useReducer } from 'react'
+
+const initialState = {
+	transactions: [],
+	textInput: '',
+	amountInput: '',
+}
+
+function reducer(state, action) {
+	switch (action.type) {
+		case 'reset':
+			return { ...state, transactions: [] }
+		case 'updateTextInput':
+			return { ...state, textInput: action.payload }
+		case 'updateAmountInput':
+			return { ...state, amountInput: Number(action.payload) }
+		case 'addTransaction':
+			if (state.textInput === '' || state.amountInput === '' || state.amountInput == 0) return { ...state }
+			return {
+				...state,
+				transactions: [
+					...state.transactions,
+					{ id: state.transactions.length + 1, text: state.textInput, amount: state.amountInput },
+				],
+				textInput: '',
+				amountInput: '',
+			}
+		default:
+			throw new Error('Uknown action type')
+	}
+}
 
 function App() {
+	const [{ transactions, textInput, amountInput }, dispatch] = useReducer(reducer, initialState)
 	const income = transactions.reduce((acc, curr) => (curr.amount > 0 ? acc + curr.amount : acc), 0)
 	const expense = transactions.reduce((acc, curr) => (curr.amount < 0 ? acc + curr.amount : acc), 0)
 
 	return (
 		<div className='expense-tracker'>
 			<h2 className='expense-tracker__title'>Expense Tracker</h2>
-			<Balance income={income} expense={expense} />
+			<Balance income={income} expense={expense} dispatch={dispatch} />
 			<TransactionsHistory transactions={transactions} />
-			<NewTransaction />
+			<NewTransaction dispatch={dispatch} textInput={textInput} amountInput={amountInput} />
 		</div>
 	)
 }
 
-function Balance({ income, expense }) {
+function Balance({ income, expense, dispatch }) {
 	const totalBalance = income - Math.abs(expense)
 	return (
 		<div className='expense-tracker__balance section'>
@@ -27,7 +54,9 @@ function Balance({ income, expense }) {
 				{totalBalance >= 0 ? `$${totalBalance.toFixed(2)}` : `-$${Math.abs(totalBalance).toFixed(2)}`}
 			</p>
 			<BalanceBoxes income={income} expense={expense} />
-			<Btn className='expense-tracker__reset-btn btn'>Reset balance</Btn>
+			<Btn className='expense-tracker__reset-btn btn' onClick={() => dispatch({ type: 'reset' })}>
+				Reset balance
+			</Btn>
 		</div>
 	)
 }
@@ -89,22 +118,26 @@ function Transaction({ el }) {
 	)
 }
 
-function NewTransaction() {
+function NewTransaction({ dispatch, textInput, amountInput }) {
 	return (
 		<div className='expense-tracker__new-transaction section'>
 			<h3 className='expense-tracker__new-transaction-title section-title'>Add new transaction</h3>
 			<hr />
-			<InputBoxes />
-			<Btn className='expense-tracker__add-btn btn'>Add transaction</Btn>
+			<InputBoxes textInput={textInput} amountInput={amountInput} dispatch={dispatch} />
+			<Btn className='expense-tracker__add-btn btn' onClick={() => dispatch({ type: 'addTransaction' })}>
+				Add transaction
+			</Btn>
 		</div>
 	)
 }
 
-function InputBoxes() {
+function InputBoxes({ dispatch, textInput, amountInput }) {
 	return (
 		<div className='expense-tracker__input-boxes'>
-			<InputBox desc='text'>Text</InputBox>
-			<InputBox desc='amount'>
+			<InputBox desc='text' type='text' inputValue={textInput} dispatch={dispatch} actionType='updateTextInput'>
+				Text
+			</InputBox>
+			<InputBox desc='amount' type='number' inputValue={amountInput} dispatch={dispatch} actionType='updateAmountInput'>
 				Amount <br />
 				(negative - expense, positive - income)
 			</InputBox>
@@ -112,19 +145,32 @@ function InputBoxes() {
 	)
 }
 
-function InputBox({ desc, children }) {
+function InputBox({ desc, type, children, inputValue, dispatch, actionType }) {
 	return (
 		<div className='expense-tracker__input-box'>
-			<label htmlFor='text-input' className='expense-tracker__input-desc'>
+			<label htmlFor={`${desc}-input`} className='expense-tracker__input-desc'>
 				{children}
 			</label>
-			<input id={`${desc}-input`} type='text' className='expense-tracker__input' placeholder={`Enter ${desc}...`} />
+			<input
+				id={`${desc}-input`}
+				type={type}
+				className='expense-tracker__input'
+				placeholder={`Enter ${desc}...`}
+				value={inputValue}
+				onChange={e => {
+					dispatch({ type: actionType, payload: e.target.value })
+				}}
+			/>
 		</div>
 	)
 }
 
-function Btn({ className, children }) {
-	return <button className={className}>{children}</button>
+function Btn({ className, children, onClick }) {
+	return (
+		<button className={className} onClick={onClick}>
+			{children}
+		</button>
+	)
 }
 
 export default App
