@@ -1,3 +1,13 @@
+$black: #000;
+$white: #fff;
+$accent-white: #f6f6f5;
+$grey: #b9b9b9;
+$shadow: 2px 2px 5px $grey;
+$green: #31c571;
+$red: #b5342e;
+$purple: #6d5ebb;
+$hover-purple: #6250bd;
+
 * {
 	box-sizing: border-box;
 	margin: 0;
@@ -13,8 +23,152 @@ body {
 	justify-content: center;
 	align-items: center;
 	height: 100svh;
-	background-color: #fff;
-	color: #000;
+	background-color: $accent-white;
+	color: $black;
 	font-family: 'Roboto', sans-serif;
 	font-size: 1.6rem;
+}
+
+.expense-tracker {
+	display: flex;
+	flex-direction: column;
+	padding: 2rem;
+	gap: 2rem;
+
+	&__title {
+		text-align: center;
+		margin-bottom: 2rem;
+		font-size: 2.8rem;
+	}
+
+	.section {
+		display: flex;
+		flex-direction: column;
+		hr {
+			margin-bottom: 1.5rem;
+		}
+	}
+
+	.section-title {
+		position: relative;
+		font-size: 1.8rem;
+		margin-bottom: 0.5rem;
+	}
+
+	&__balance-title.section-title {
+		text-transform: uppercase;
+		margin-bottom: 0;
+	}
+
+	&__total-balance {
+		font-size: 2.6rem;
+		font-weight: bold;
+	}
+
+	&__balance-boxes {
+		display: flex;
+		justify-content: space-evenly;
+		gap: 4rem;
+		margin: 2rem 0;
+		padding: 2rem 4rem;
+		background-color: $white;
+		border-radius: 0.2rem;
+		box-shadow: $shadow;
+	}
+
+	&__balance-box {
+		text-align: center;
+	}
+
+	&__box-title {
+		text-transform: uppercase;
+		font-weight: bold;
+		margin-bottom: 0.4rem;
+	}
+
+	&__partial-balance {
+		font-size: 2rem;
+		&--income {
+			color: $green;
+		}
+
+		&--expense {
+			color: $red;
+		}
+	}
+
+	&__separate-line {
+		width: 1px;
+		background-color: $grey;
+	}
+
+	.btn {
+		padding: 1rem 2rem;
+		background-color: $purple;
+		color: $white;
+		border: none;
+		font-size: inherit;
+		cursor: pointer;
+		transition: background-color 0.3s;
+
+		&:hover,
+		&:focus-visible {
+			background-color: $hover-purple;
+		}
+	}
+
+	&__transactions {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		list-style: none;
+	}
+
+	&__transaction {
+		display: flex;
+		justify-content: space-between;
+		position: relative;
+		padding: 1.2rem;
+		background-color: $white;
+		border-radius: .2rem;
+		box-shadow: $shadow;
+		overflow: hidden;
+
+		&::after {
+			content: '';
+			position: absolute;
+			inset: 0 0 0 auto;
+			width: 5px;
+		}
+
+		&--income::after {
+			background-color: $green;
+		}
+
+		&--expense::after {
+			background-color: $red;
+		}
+	}
+
+	&__transaction-amount {
+		margin-right: 0.5rem;
+	}
+
+	&__input-boxes {
+		display: flex;
+		flex-direction: column;
+		gap: 2rem;
+		margin-bottom: 2rem;
+	}
+
+	&__input-box {
+		display: flex;
+		flex-direction: column;
+		gap: .5rem;
+	}
+
+	&__input {
+		padding: .8rem 0.6rem;
+		font-size: inherit;
+	}
 }

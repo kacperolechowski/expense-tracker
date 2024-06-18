@@ -1,8 +1,7 @@
 const transactions = [
-	{ amount: 1500, id: 1, text: 'Bonus' },
-	{ amount: -50, id: 2, text: 'text' },
+	{ amount: 5000, id: 4, text: 'Salary' },
+	{ amount: -50, id: 1, text: 'Cinema' },
 	{ amount: -3000, id: 3, text: 'Car' },
-	{ amount: 3000, id: 4, text: 'Salary' },
 ]
 
 function App() {
@@ -20,12 +19,12 @@ function App() {
 }
 
 function Balance({ income, expense }) {
-	const totalBalance = income - expense
+	const totalBalance = income - Math.abs(expense)
 	return (
 		<div className='expense-tracker__balance section'>
 			<h3 className='expense-tracker__balance-title section-title'>Your balance</h3>
 			<p className='expense-tracker__total-balance'>
-				{totalBalance >= 0 ? totalBalance.toFixed(2) : `-$${(totalBalance * -1).toFixed(2)}`}
+				{totalBalance >= 0 ? `$${totalBalance.toFixed(2)}` : `-$${Math.abs(totalBalance).toFixed(2)}`}
 			</p>
 			<BalanceBoxes income={income} expense={expense} />
 			<Btn className='expense-tracker__reset-btn btn'>Reset balance</Btn>
@@ -48,7 +47,7 @@ function BalanceBox({ boxType, balance }) {
 		<div className='expense-tracker__balance-box'>
 			<p className='expense-tracker__box-title'>{boxType}</p>
 			<p className={`expense-tracker__partial-balance expense-tracker__partial-balance--${boxType}`}>
-				${balance.toFixed(2)}
+				{balance >= 0 ? `${balance.toFixed(2)}` : `-$${Math.abs(balance).toFixed(2)}`}
 			</p>
 		</div>
 	)
