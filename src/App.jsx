@@ -1,59 +1,26 @@
-import { useReducer } from 'react'
-
-const initialState = {
-	transactions: [],
-	textInput: '',
-	amountInput: '',
-}
-
-function reducer(state, action) {
-	switch (action.type) {
-		case 'reset':
-			return { ...state, transactions: [] }
-		case 'updateTextInput':
-			return { ...state, textInput: action.payload }
-		case 'updateAmountInput':
-			return { ...state, amountInput: Number(action.payload) }
-		case 'addTransaction':
-			if (state.textInput === '' || state.amountInput === '' || state.amountInput == 0) return { ...state }
-			return {
-				...state,
-				transactions: [
-					...state.transactions,
-					{ id: state.transactions.length + 1, text: state.textInput, amount: state.amountInput },
-				],
-				textInput: '',
-				amountInput: '',
-			}
-		default:
-			throw new Error('Uknown action type')
-	}
-}
+import { useTransactions } from './TransactionsContext'
 
 function App() {
-	const [{ transactions, textInput, amountInput }, dispatch] = useReducer(reducer, initialState)
-	const income = transactions.reduce((acc, curr) => (curr.amount > 0 ? acc + curr.amount : acc), 0)
-	const expense = transactions.reduce((acc, curr) => (curr.amount < 0 ? acc + curr.amount : acc), 0)
-
 	return (
 		<div className='expense-tracker'>
 			<h2 className='expense-tracker__title'>Expense Tracker</h2>
-			<Balance income={income} expense={expense} dispatch={dispatch} />
-			<TransactionsHistory transactions={transactions} />
-			<NewTransaction dispatch={dispatch} textInput={textInput} amountInput={amountInput} />
+			<Balance />
+			<TransactionsHistory />
+			<NewTransaction />
 		</div>
 	)
 }
 
-function Balance({ income, expense, dispatch }) {
-	const totalBalance = income - Math.abs(expense)
+function Balance() {
+	const { totalBalance, dispatch } = useTransactions()
+
 	return (
 		<div className='expense-tracker__balance section'>
 			<h3 className='expense-tracker__balance-title section-title'>Your balance</h3>
 			<p className='expense-tracker__total-balance'>
 				{totalBalance >= 0 ? `$${totalBalance.toFixed(2)}` : `-$${Math.abs(totalBalance).toFixed(2)}`}
 			</p>
-			<BalanceBoxes income={income} expense={expense} />
+			<BalanceBoxes />
 			<Btn className='expense-tracker__reset-btn btn' onClick={() => dispatch({ type: 'reset' })}>
 				Reset balance
 			</Btn>
@@ -61,7 +28,8 @@ function Balance({ income, expense, dispatch }) {
 	)
 }
 
-function BalanceBoxes({ income, expense }) {
+function BalanceBoxes() {
+	const { income, expense } = useTransactions()
 	return (
 		<div className='expense-tracker__balance-boxes'>
 			<BalanceBox boxType='income' balance={income} />
@@ -82,21 +50,19 @@ function BalanceBox({ boxType, balance }) {
 	)
 }
 
-function TransactionsHistory({ transactions }) {
+function TransactionsHistory() {
+	const { transactions } = useTransactions()
 	return (
 		<div className='expense-tracker__history section'>
 			<h3 className='expense-tracker__history-title section-title'>History</h3>
 			<hr />
-			{transactions.length === 0 ? (
-				<p>You don't have any transactions yet!</p>
-			) : (
-				<TransactionsList transactions={transactions} />
-			)}
+			{transactions.length === 0 ? <p>You don't have any transactions yet!</p> : <TransactionsList />}
 		</div>
 	)
 }
 
-function TransactionsList({ transactions }) {
+function TransactionsList() {
+	const { transactions } = useTransactions()
 	return (
 		<ul className='expense-tracker__transactions'>
 			{transactions.map(transaction => (
@@ -118,12 +84,13 @@ function Transaction({ el }) {
 	)
 }
 
-function NewTransaction({ dispatch, textInput, amountInput }) {
+function NewTransaction() {
+	const { dispatch } = useTransactions()
 	return (
 		<div className='expense-tracker__new-transaction section'>
 			<h3 className='expense-tracker__new-transaction-title section-title'>Add new transaction</h3>
 			<hr />
-			<InputBoxes textInput={textInput} amountInput={amountInput} dispatch={dispatch} />
+			<InputBoxes />
 			<Btn className='expense-tracker__add-btn btn' onClick={() => dispatch({ type: 'addTransaction' })}>
 				Add transaction
 			</Btn>
@@ -131,13 +98,14 @@ function NewTransaction({ dispatch, textInput, amountInput }) {
 	)
 }
 
-function InputBoxes({ dispatch, textInput, amountInput }) {
+function InputBoxes() {
+	const { textInput, amountInput } = useTransactions()
 	return (
 		<div className='expense-tracker__input-boxes'>
-			<InputBox desc='text' type='text' inputValue={textInput} dispatch={dispatch} actionType='updateTextInput'>
+			<InputBox desc='text' type='text' inputValue={textInput} actionType='updateTextInput'>
 				Text
 			</InputBox>
-			<InputBox desc='amount' type='number' inputValue={amountInput} dispatch={dispatch} actionType='updateAmountInput'>
+			<InputBox desc='amount' type='number' inputValue={amountInput} actionType='updateAmountInput'>
 				Amount <br />
 				(negative - expense, positive - income)
 			</InputBox>
@@ -145,7 +113,8 @@ function InputBoxes({ dispatch, textInput, amountInput }) {
 	)
 }
 
-function InputBox({ desc, type, children, inputValue, dispatch, actionType }) {
+function InputBox({ desc, type, children, inputValue, actionType }) {
+	const { dispatch } = useTransactions()
 	return (
 		<div className='expense-tracker__input-box'>
 			<label htmlFor={`${desc}-input`} className='expense-tracker__input-desc'>
